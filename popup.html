@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Focus Filter</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 15px;
+      width: 350px; /* Increased width slightly */
+      color: #333;
+    }
+    h1 {
+      font-size: 18px;
+      margin-top: 0;
+      color: #2c3e50;
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px; /* Adjusted gap */
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%; /* Make buttons full width by default */
+    }
+    button:hover {
+      background-color: #356ac3;
+    }
+    .input-group {
+        display: flex;
+        align-items: center;
+    }
+    .input-group input[type="text"] {
+        flex-grow: 1;
+        margin-right: 5px;
+    }
+    .input-group button {
+        width: auto; /* Override full width for small buttons */
+        padding: 8px;
+    }
+
+    .section {
+        border: 1px solid #eee;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top:10px;
+    }
+    .section h2 {
+        font-size: 16px;
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: #34495e;
+    }
+
+    .api-key-section {
+      background-color: #f9f9f9;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .status {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 4px;
+      display: none; /* Hidden by default */
+      text-align: center;
+      font-size: 13px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .keyword-stats {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .collapsible {
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      background-color: #f1f1f1;
+      border-radius:4px;
+    }
+    .collapsible:after {
+      content: "\002B"; /* + symbol */
+      font-weight: bold;
+    }
+    .active:after {
+      content: "\2212"; /* - symbol */
+    }
+    .content {
+      padding: 0 10px; /* Add some padding to content */
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.2s ease-out;
+      background-color: #f9f9f9;
+      border-radius: 0 0 4px 4px;
+      border: 1px solid #eee;
+      border-top: none;
+    }
+    #keywords-display-area {
+      max-height: 300px; /* Increased height to show more content */
+      overflow-y: auto; 
+      background: #f0f0f0; 
+      padding: 8px; 
+      margin-top: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      word-break: break-word;
+      display: none; /* Hidden by default */
+      white-space: pre-wrap; /* Preserve whitespace and wrapping */
+      font-family: monospace; /* Better for displaying code */
+    }
+    
+    #keywords-display-area pre {
+      margin: 0;
+      padding: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    #debug-info {
+      margin-top: 10px; 
+      font-size: 11px; 
+      color: #777; 
+      word-break: break-all;
+      max-height: 50px;
+      overflow-y: auto;
+      background: #fafafa;
+      padding: 5px;
+      border-radius: 3px;
+    }
+    .fixed-api-info {
+        font-size: 12px;
+        color: #555;
+        background-color: #e9ecef;
+        padding: 8px;
+        border-radius: 4px;
+        text-align: center;
+    }
+    
+    /* Toggle switch styles */
+    .toggle-container {
+        display: flex;
+        align-items: center;
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+      width: 36px;
+        height: 20px;
+      margin-right: 8px;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+      transition: .4s;
+        border-radius: 20px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+      transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: #2196F3;
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(16px);
+    }
+    
+    .toggle-label {
+      font-size: 12px;
+      color: #555;
+    }
+    
+    /* Add tooltip style */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      margin-left: 4px;
+      cursor: help;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 11px;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Focus Filter</h1>
+    
+    <form id="taskForm">
+      <label for="taskInput">What are you working on right now?</label>
+      <input type="text" id="taskInput" name="task" placeholder="e.g., Writing a research paper on climate change">
+      
+      <button type="submit" id="submitButton">Set Task</button>
+    </form>
+    
+    <!-- Global Task Setting -->
+    <div class="section">
+      <h2>Current Task</h2>
+      <input type="text" id="task" placeholder="What are you working on?">
+      <div class="keyword-stats" id="keyword-stats"></div>
+      <div style="display: flex; gap: 8px; margin-top:8px;">
+        <button id="save-task-btn" style="flex-grow:1;">Save Task</button>
+        <button id="generate-keywords-btn" style="flex-grow:1; background-color: #28a745;">Generate Keywords</button>
+      </div>
+      <div class="status" id="status-task"></div>
+    </div>
+
+    <!-- Check Specific URL -->
+    <div class="section">
+        <h2>Check Specific URL</h2>
+        <div class="input-group">
+            <input type="text" id="website" placeholder="Enter or refresh URL">
+            <button id="refresh-url" title="Refresh URL">↻</button>
+        </div>
+        <button id="check-relevance-btn" style="margin-top:8px;">Check Relevance</button>
+        <div id="result-relevance" class="status"></div>
+    </div>
+
+    <!-- Show Keywords -->
+    <div class="section">
+        <h2>Task Keywords</h2>
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <button id="show-keywords-btn" style="flex-grow:1;">Show/Hide Keywords</button>
+            <button id="export-response-btn" style="flex-grow:1; background-color: #28a745;">Export Response</button>
+        </div>
+        <div id="keywords-display-area">
+            <!-- Keywords will be shown here -->
+        </div>
+    </div>
+    
+    <!-- YouTube Search Filter Section -->
+    <div class="section">
+        <h2>YouTube Settings</h2>
+        <div class="toggle-container">
+            <span>Filter YouTube Search Results:</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="youtube-search-filter-toggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        <div class="toggle-container">
+            <span>Filter YouTube Channel Pages:</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="youtube-channel-filter-toggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        <div class="status" id="youtube-filter-status"></div>
+    </div>
+    
+    <!-- Auto-Close Irrelevant Pages Section -->
+    <div class="section">
+      <h2>Auto-Close Feature</h2>
+      <div class="toggle-container" style="background-color: #ffebeb; padding: 8px; border-radius: 4px; border: 1px solid #ff8080;">
+        <label class="toggle-switch">
+          <input type="checkbox" id="autoCloseToggle">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label" style="font-weight: bold; color: #d32f2f;">Auto-close irrelevant pages</span>
+        <div class="tooltip">?
+          <span class="tooltiptext">When enabled, pages determined to be irrelevant to your current task will be automatically closed. A notification will appear when this happens.</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 8px;">
+        <button id="testCloseBtn" style="background-color: #d32f2f;">Test Auto-Close</button>
+        <button id="testNotificationBtn">Test Notification</button>
+      </div>
+      <button id="scanAllTabsBtn" style="margin-top: 8px; background-color: #b71c1c; color: white; font-weight: bold;">
+        SCAN & CLOSE ALL IRRELEVANT TABS
+      </button>
+      <div class="status" id="auto-close-status"></div>
+    </div>
+    
+    <!-- Advanced Settings -->
+    <div class="collapsible">
+      <label>Advanced Settings</label>
+    </div>
+    <div class="content">
+      <div class="fixed-api-info">
+        <p>API Key is fixed and pre-configured.</p>
+        <p>Using model: GEMMA 3N E4B Instruct</p>
+      </div>
+      <div style="margin-top: 10px; text-align: center;">
+        <a href="settings.html" target="_blank" style="color: #4285f4; text-decoration: none; font-weight: bold;">Manage Whitelist/Blacklist Settings</a>
+      </div>
+    </div>
+    
+    <div id="debug-info"></div>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 
