@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Chrome extension to check website relevance using GEMMA AI",
   "scripts": {
-    "dev": "web-ext run",
+    "dev": "web-ext run --target chromium",
     "build": "web-ext build"
   },
   "devDependencies": {
